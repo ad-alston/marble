@@ -1,0 +1,53 @@
+#################################################
+# cars.mb
+#
+# Sample marble program.  (To-be-met) milestone
+# execution goal.
+#################################################
+
+adapter SimpleMySQL {
+	translation {
+		string => "BIGTEXT"
+		double => "FLOAT"
+		float  => "FLOAT"
+		int    => "BIGINT"
+		signature => "PRIMARY KEY"
+	}
+
+	connection medium : MySQLConnector
+}
+
+class Car allows all contexts {
+	signature string make
+	int weight = 0
+
+	define Car(String m, int w){
+		make = m
+		weight = w
+	}
+}
+
+# Context persisting in MySQL instance located at localhost:9001
+context main = { SimpleMySQL<>connection("localhost", 9001) }
+# Transient memory context
+context mem = { memory }
+
+Car car1 = { main } Car("Ford Taurus", 0)
+Car car2 = { mem }  Car("Honda Civic", 500)
+
+if car1.weight > car2.weight {
+	print "Ford Taurus is heavier now!"
+} else{
+	print "Honda Civic is the heavier car."
+	car1.weight += 1000
+}
+
+# First run of this program should output "Honda Civic is the heavier car."
+# Second run of this program should involve a persisting "Ford Taurus" with weight
+# 1000.  Output should be "Ford Taurus is heavier now!"
+
+
+
+
+
+
